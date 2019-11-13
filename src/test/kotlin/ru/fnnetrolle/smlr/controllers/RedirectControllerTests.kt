@@ -72,6 +72,6 @@ class RedirectControllerTests {
 //        mockMvc.perform(MockMvcRequestBuilders.get(PATH))
 //                .andExpect(MockMvcResultMatchers.status().`is`(REDIRECT_STATUS))
 //                .andExpect(MockMvcResultMatchers.header().string(HEADER_NAME, HEADER_VALUE))
-        Assert.assertTrue(true)
+        Assert.assertTrue(false)
     }
 }
