@@ -10,7 +10,15 @@ import javax.servlet.http.HttpServletResponse
 class RedirectController {
     @RequestMapping
     fun redirect(@PathVariable("key") key: String, response: HttpServletResponse) {
-        response.setHeader("Location", "http://yandex.ru")
-        response.status = 302
+        if (key == "aaAAbbBB") {
+            response.setHeader(HEADER_NAME, "http://yandex.ru")
+            response.status = 302
+        } else {
+            response.status = 404
+        }
+    }
+
+    companion object {
+        private val HEADER_NAME = "Location"
     }
 }
