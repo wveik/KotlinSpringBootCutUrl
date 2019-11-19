@@ -37,4 +37,9 @@ class DefaultKeyMapperServiceTests {
         Assert.assertEquals(KeyMapperService.Get.NotFound(KEY),
                 service.getLink(KEY))
     }
+
+    @Test
+    fun failTest() {
+        Assert.fail();
+    }
 }
