@@ -1,26 +1,38 @@
 package ru.fnnetrolle.smlr.services.Impl
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import ru.fnnetrolle.smlr.services.KeyConverterService
 import ru.fnnetrolle.smlr.services.KeyMapperService
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 
 @Component
 class DefaultKeyMapperService : KeyMapperService {
 
-    private val map: MutableMap<String, String> = ConcurrentHashMap()
+    @Autowired
+    lateinit var converter: KeyConverterService
 
-    override fun add(key: String, link: String): KeyMapperService.Add {
-        if (map.containsKey(key))
-            return KeyMapperService.Add.AlreadyExist(key)
+    val sequence = AtomicLong(3000000L)
 
-        map[key] = link
-        return KeyMapperService.Add.Success(key, link)
+    private val map: MutableMap<Long, String> = ConcurrentHashMap()
+
+    override fun add(key: String): String {
+        val id = sequence.get()
+        val key = converter.idToKey(id)
+        map[id] = key
+
+        return key
     }
 
     override fun getLink(key: String): KeyMapperService.Get {
-        if (map.containsKey(key))
-            return KeyMapperService.Get.Link(map[key]!!)
+        val id = converter.keyToId(key)
+        val result = map[id]
 
-        return KeyMapperService.Get.NotFound(key)
+        if (result == null)
+            return KeyMapperService.Get.NotFound(key)
+
+        return KeyMapperService.Get.Link(result)
+
     }
 }

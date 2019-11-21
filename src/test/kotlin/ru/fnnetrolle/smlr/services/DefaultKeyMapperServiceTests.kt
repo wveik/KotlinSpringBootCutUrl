@@ -1,36 +1,48 @@
 package ru.fnnetrolle.smlr.services
 
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
 import ru.fnnetrolle.smlr.services.Impl.DefaultKeyMapperService
 
 class DefaultKeyMapperServiceTests {
 
+    @InjectMocks
+    val service: KeyMapperService = DefaultKeyMapperService()
+
     private val KEY: String = "aaAAbbBB"
-    private val LINK: String = "https://yandex.ru/"
-    private val LINK_NEW: String = "https://www.google.ru/"
 
-    private val service : KeyMapperService = DefaultKeyMapperService()
+    private val KEY_A: String = "abc"
+    private val KEY_B: String = "cde"
 
-    @Test
-    fun clientCanAddNewKeyWithLink() {
-        Assert.assertEquals(KeyMapperService.Add.Success(KEY, LINK),
-                service.add(KEY, LINK))
+    private val ID_A: Long = 3000000L
+    private val ID_B: Long = 3000001L
 
-        Assert.assertEquals(KeyMapperService.Get.Link(LINK),
-                service.getLink(KEY))
+
+    @Mock
+    lateinit var converter: KeyConverterService
+
+    @Before
+    fun init() {
+        MockitoAnnotations.initMocks(this)
+
+        Mockito.`when`(converter.keyToId(KEY_A)).thenReturn(ID_A)
+        Mockito.`when`(converter.idToKey(ID_A)).thenReturn(KEY_A)
     }
 
     @Test
-    fun clientCanNotAddExistingKey() {
-        service.add(KEY, LINK)
+    fun clientCanAddLinks() {
 
-        Assert.assertEquals(KeyMapperService.Add.AlreadyExist(KEY),
-                service.add(KEY, LINK_NEW))
+        val keyA = service.add(KEY_A)
+        var linkA = service.getLink(keyA)
+        Assert.assertEquals(KeyMapperService.Get.Link(KEY_A), linkA)
 
-        Assert.assertEquals(KeyMapperService.Get.Link(LINK),
-                service.getLink(KEY))
     }
+
 
     @Test
     fun clientCanNotTakeLinkIfKeyIsNotFoundInService() {
@@ -38,8 +50,4 @@ class DefaultKeyMapperServiceTests {
                 service.getLink(KEY))
     }
 
-    @Test
-    fun failTest() {
-        Assert.fail();
-    }
 }
