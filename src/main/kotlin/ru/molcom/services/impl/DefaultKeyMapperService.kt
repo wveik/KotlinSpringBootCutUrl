@@ -2,10 +2,11 @@ package ru.molcom.services.impl
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+import ru.molcom.repositories.LinkRepository
 import ru.molcom.services.KeyConverterService
 import ru.molcom.services.KeyMapperService
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicLong
+import ru.molcom.model.Link as Link
 
 @Component
 class DefaultKeyMapperService : KeyMapperService {
@@ -13,26 +14,24 @@ class DefaultKeyMapperService : KeyMapperService {
     @Autowired
     lateinit var converter: KeyConverterService
 
-    val sequence = AtomicLong(3000000L)
+    @Autowired
+    lateinit var repository: LinkRepository
 
-    private val map: MutableMap<Long, String> = ConcurrentHashMap()
+    @Transactional
+    override fun add(link: String): String {
+        val newLink = Link(0, link)
+        var id = repository.save(newLink).id
+        converter.idToKey(id)
 
-    override fun add(key: String): String {
-        val id = sequence.get()
-        val key = converter.idToKey(id)
-        map[id] = key
-
-        return key
+        return link
     }
 
     override fun getLink(key: String): KeyMapperService.Get {
-        val id = converter.keyToId(key)
-        val result = map[id]
-
-        if (result == null)
-            return KeyMapperService.Get.NotFound(key)
-
-        return KeyMapperService.Get.Link(result)
-
+        val result = repository.findById(converter.keyToId(key))
+        return if (result.isPresent) {
+            KeyMapperService.Get.Link(result.get().text)
+        } else {
+            KeyMapperService.Get.NotFound(key)
+        }
     }
 }
