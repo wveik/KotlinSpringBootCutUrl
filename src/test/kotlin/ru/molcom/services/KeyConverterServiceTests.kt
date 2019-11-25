@@ -1,6 +1,7 @@
 package ru.molcom.services
 
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,16 +14,21 @@ import ru.molcom.services.impl.DefaultKeyConverterService
 @RunWith(SpringRunner::class)
 class KeyConverterServiceTests {
 
-    @TestConfiguration
-    internal class EmployeeServiceImplTestContextConfiguration {
-        @Bean
-        fun employeeService(): KeyConverterService {
-            return DefaultKeyConverterService()
-        }
+    private var service: KeyConverterService? = null
+
+    @Before
+    fun init() {
+        service = DefaultKeyConverterService()
     }
 
-    @Autowired
-    private val service: KeyConverterService? = null
+//    @TestConfiguration
+//    internal class EmployeeServiceImplTestContextConfiguration {
+//        @Bean
+//        fun employeeService(): KeyConverterService {
+//            return DefaultKeyConverterService()
+//        }
+//    }
+
 
     private val TST_ID: Long = 3000001L
     private val TST_KEY: String = "aaaA"
