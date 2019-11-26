@@ -20,14 +20,14 @@ class DefaultKeyMapperService : KeyMapperService {
     @Transactional
     override fun add(link: String): String {
         val newLink = Link(0, link)
-        var id = repository.save(newLink).id
-        converter.idToKey(id)
+        var dbLink = repository.save(newLink)
 
-        return link
+        return converter.idToKey(dbLink.id)
     }
 
     override fun getLink(key: String): KeyMapperService.Get {
-        val result = repository.findById(converter.keyToId(key))
+        val id = converter.keyToId(key)
+        val result = repository.findById(id)
         return if (result.isPresent) {
             KeyMapperService.Get.Link(result.get().text)
         } else {

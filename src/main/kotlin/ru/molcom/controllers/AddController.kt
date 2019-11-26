@@ -19,8 +19,11 @@ class AddController {
 
     @RequestMapping(path = ["add"], method = [RequestMethod.POST])
     @ResponseBody
-    fun addRest(@RequestBody request: AddRequest) =
-            ResponseEntity.ok(AddResponse(request.link, service.add(request.link)))
+    fun addRest(@RequestBody request: AddRequest): ResponseEntity<AddResponse> {
+        val result = AddResponse(request.link, service.add(request.link))
+
+        return ResponseEntity.ok(result)
+    }
 
     @RequestMapping(path = ["addhtml"], method = [RequestMethod.POST])
     fun addHtml(model: Model,
